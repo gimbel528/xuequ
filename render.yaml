@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: xuequ-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: xuequ-db
+          property: connectionString
+
+databases:
+  - name: xuequ-db
+    databaseName: xuequ
+    user: xuequ
