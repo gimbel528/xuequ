@@ -8,9 +8,16 @@ from typing import Optional, List
 import os
 import httpx
 
-# 数据库配置
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'schools.db')}"
+# 数据库配置 - 使用 Turso 或本地 SQLite
+TURSO_URL = os.getenv("TURSO_URL")
+TURSO_TOKEN = os.getenv("TURSO_TOKEN")
+
+if TURSO_URL and TURSO_TOKEN:
+    DATABASE_URL = f"sqlite+libsql://{TURSO_URL}?authToken={TURSO_TOKEN}"
+else:
+    # 本地开发使用 SQLite
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'schools.db')}"
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -135,11 +142,11 @@ async def geocode_school(name: str, address: str = None):
 # Routes
 @app.get("/")
 def root():
-    return {"message": "School District API", "docs": "/docs"}
+    return {"message": "School District API", "docs": "/docs", "db_url": DATABASE_URL.split("?")[0] if TURSO_URL else "local"}
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "db_url": DATABASE_URL.split("?")[0] if TURSO_URL else "local"}
 
 @app.get("/api/schools", response_model=List[SchoolWithDistrict])
 def get_schools(db: Session = Depends(get_db)):
