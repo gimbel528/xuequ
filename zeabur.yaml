@@ -1,0 +1,20 @@
+services:
+  - name: backend
+    type: web
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    env:
+      PORT: 8000
+    source:
+      type: static
+      path: backend
+
+  - name: frontend
+    type: web
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: npm run preview -- --host 0.0.0.0 --port $PORT
+    env:
+      PORT: 3000
+    source:
+      type: static
+      path: frontend
