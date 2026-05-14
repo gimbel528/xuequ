@@ -2,7 +2,7 @@ import axios from 'axios'
 import type { School, SchoolForm, District, Community, CommunityForm } from '@/types'
 
 const api = axios.create({
-  baseURL: 'https://xuequ-three-vercel.app/api',
+  baseURL: 'https://xuequ-backend.onrender.com/api',
   timeout: 30000
 })
 
